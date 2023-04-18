@@ -8,15 +8,15 @@ module imem
     output  [31:0]  dout
 );
 
-    logic   [31:0]  data[0:IMEM_DEPTH-1];
+    logic   [31:0]  data[0:IMEM_DEPTH-1]      ;
 
-    assign dout = data[addr];
+    assign dout = data[addr]                  ;
 
 // synthesis translate_off
     initial begin
         for (int i = 0; i < IMEM_DEPTH; i++)
-            data[i] = 'b0;
-        $readmemb("imem.mem", data);
+            data[i] = 'b0               ;
+        $readmemb("imem.mem", data)     ;
     end
 // synthesis translate_on
 
