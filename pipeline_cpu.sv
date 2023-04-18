@@ -2,7 +2,7 @@
 
 `define FF 1
 // Packed structures for pipeline registers
-// COMPLETE THE PIPELINE INTERFACES USING PACKED STRUCTURES
+
 // Pipe reg: IF/ID
 typedef struct packed {
     logic   [31:0]  pc;
@@ -58,7 +58,7 @@ typedef struct packed {
     logic           mem_to_reg;
 } pipe_mem_wb;
 
-/* verilator lint_off UNUSED */
+
 module pipeline_cpu
 #(  parameter   IMEM_DEPTH      = 1024  ,    // imem depth (default: 1024 entries = 4 KB)
                 IMEM_ADDR_WIDTH = 10    ,
@@ -108,7 +108,7 @@ module pipeline_cpu
   /* IF/ID pipeline register
      * - Supporting pipeline stalls and flush
      */
-    pipe_if_id      id  ;         // THINK WHY THIS IS ID...
+    pipe_if_id      id  ;         
 
     logic           if_flush, if_stall;
 
@@ -174,8 +174,6 @@ module pipeline_cpu
      */
     logic       [31:0]          imm32           ;
     logic       [31:0]          imm32_branch    ;  // imm32 left shifted by 1
-
-    // COMPLETE IMMEDIATE GENERATOR HERE
     logic       [11:0]          imm12           ;
     logic       [19:0]          imm20           ;
 
@@ -325,8 +323,7 @@ module pipeline_cpu
     end
   logic       [3:0]   alu_control     ;    // ALU control signal
 
-    // COMPLETE ALU CONTROL UNIT
-
+    /* CONTROL UNIT */
     always_comb begin
         if (ex.alu_op == 2'b00)                                 alu_control = 4'b0010   ; // add - etc
         else if (ex.alu_op == 2'b01)                            alu_control = 4'b0111   ; // sub - sb-type
@@ -354,8 +351,7 @@ module pipeline_cpu
     logic       [1:0]   forward_b       ;
     logic   [REG_WIDTH-1:0]  alu_fwd_in1, alu_fwd_in2;   // outputs of forward MUXes
 
-        /* verilator lint_off CASEX */
-   // COMPLETE FORWARDING MUXES
+   /* FORWARDING MUXES */
     always_comb begin
             if      (forward_a == 2'b00) alu_fwd_in1 = ex.rs1_dout      ;
             else if (forward_a == 2'b10) alu_fwd_in1 = mem.alu_result   ;
@@ -365,10 +361,9 @@ module pipeline_cpu
             else if (forward_b == 2'b10) alu_fwd_in2 = mem.alu_result   ;
             else if (forward_b == 2'b01) alu_fwd_in2 = (mem.mem_to_reg == 1'b1) ? wb.dmem_dout : (mem.reg_write == 1'b1) ? wb.alu_result : 32'b0 ;
     end
-
-        /* verilator lint_on CASEX */
-        // COMPLETE THE FORWARDING UNIT
-    // Need to prioritize forwarding conditions
+    
+    /*  FORWARDING UNIT */
+    // prioritize forwarding conditions
     always_comb begin
          if(mem.reg_write == 1'b1 && mem.rd != 5'b0 && mem.rd == ex.rs1) forward_a = 2'b10; // ex hazard
          else if (wb.reg_write == 1'b1 && (wb.rd != 5'b0) && !(mem.reg_write == 1'b1 && (mem.rd != 5'b0) && (mem.rd == ex.rs1))&&(wb.rd == ex.rs1)) forward_a = 2'b01; // mem hazard
@@ -384,7 +379,6 @@ module pipeline_cpu
     // ALU
     logic   [REG_WIDTH-1:0] alu_in1, alu_in2;
     logic   [REG_WIDTH-1:0] alu_result;
-    //logic           alu_zero;   // will not be used
 
     assign      alu_in1 = (ex.opcode == 7'b0010111 || ex.opcode == 7'b1101111) ? ex.pc : (ex.opcode == 7'b0110111) ? 32'b0 :  alu_fwd_in1       ;
     assign      alu_in2 =  (ex.alu_src == 1'b1 && ex.opcode != 7'b0010111) ? ex.imm32 : (ex.alu_src == 1'b1 && ex.opcode == 7'b0010111) ? ex.imm32_branch : alu_fwd_in2 ;
