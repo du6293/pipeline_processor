@@ -1,4 +1,4 @@
-# pipeline_processor_verilog
+# pipeline_processor_system verilog
 RISC-V pipeline processor with system verilog
 
 I aimed to implement all 32-bit integer instruction sets of risc-v.
