@@ -1,6 +1,8 @@
 # pipeline_processor_system verilog
 RISC-V pipeline processor with system verilog
 
+It was based on the professor's guidelines and his skeleton code.
+
 I aimed to implement all 32-bit integer instruction sets of risc-v.
 
 Especially, this time, I designed focusing on the data forwarding and hazard detection.
